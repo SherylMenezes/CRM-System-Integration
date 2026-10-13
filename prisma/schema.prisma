@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum WebhookStatus {
+  QUEUED
+  PROCESSED
+  FAILED
+}
+
+model WebhookEvent {
+  id           String        @id @default(uuid())
+  deliveryId   String?       @unique
+  topic        String        
+  payload      Json
+  status       WebhookStatus @default(QUEUED)
+  errorMessage String?       @db.Text
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model CustomerMapping {
+  id           String   @id @default(uuid())
+  wcCustomerId Int?     
+  email        String   @unique
+  crmContactId String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model OrderMapping {
+  id           String   @id @default(uuid())
+  wcOrderId    Int      @unique
+  crmDealId    String   @unique
+  status       String
+  amount       Decimal  @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
